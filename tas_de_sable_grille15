@@ -1,0 +1,109 @@
+##################################
+# groupe MI 3
+# Edgar BAGHDASARYAN
+# Ali HARGAS
+# Hatim ZELAMTA
+# Anis FETOUAB
+# https://github.com/uvsq22102013/projet_tas_de_sable/settings/interaction_limits
+##################################
+
+import tkinter as tk
+import random
+
+HEIGHT = 600
+WIDTH = 600
+obj = []##liste dans laquelle vont être stockés les grains de sable pour pouvoir ensuite les effacer
+p = HEIGHT/600
+
+##création de la fenêtre tkinter et du canvas
+racine = tk.Tk()
+canvas = tk.Canvas(racine, height = HEIGHT, width=WIDTH, bg = "darkblue")
+canvas.grid(row = 0, column = 0)
+
+l3=[[0,0,0]]
+for j in range(15):
+    for i in range(15):
+        l2=[]
+        ##création de la grille 15x15 dont chaque carré fait 40 de côté
+        canvas.create_rectangle((i*40,40*j),(40+i*40,40+j*40), outline = "black")
+        l2.append(i)
+        l2.append(j)
+        ##attribution aléatoire du nombre de grains de sable pour chaque case
+        if 4 <i< 11 and 4 <j< 11 :
+            l2.append(random.randint(3,5))
+        else :
+            l2.append(random.randint(1,2))
+        l3.append(l2)
+
+##création des grains de sable sous forme de ronds jaunes
+decal_x = [5,5,15,25,25]
+decal_y = [5,25,15,25,5]
+decal_a = [25,25,15,5,5]
+decal_b = [25,5,15,5,25]
+e = 0
+for v in range(1,226):
+    for r in range(l3[v][2]):
+        obj.append(canvas.create_oval((l3[v][0]*40*p+decal_x[r]*p,0+40*l3[v][1]*p+decal_y[r]*p),(40*p+l3[v][0]*40*p-decal_a[r]*p,40*p+40*l3[v][1]*p-decal_b[r]*p), fill ="yellow"))
+
+##fonction qui attribue le nouveau nombre de grains de sable de chaque case(nouvelle configuration)
+def changement_config():
+    global l3, obj
+    for v in range(1,226):
+        if l3[v][0] == 0 and l3[v][1]== 0 and l3[v][2] >= 4:
+            l3[v][2] -= 2
+            l3[v+1][2] += 1
+            l3[v+14][2] += 1
+        elif l3[v][0] == 14 and l3[v][1]== 0 and l3[v][2] >= 4:
+            l3[v][2] -= 2
+            l3[v-1][2] += 1
+            l3[v+14][2] += 1
+        elif l3[v][0] == 0 and l3[v][1]== 14 and l3[v][2] >= 4:
+            l3[v][2] -= 2
+            l3[v+1][2] += 1
+            l3[v-14][2] += 1
+        elif l3[v][0] == 14 and l3[v][1]== 14 and l3[v][2] >= 4:
+            l3[v][2] -= 2
+            l3[v-1][2] += 1
+            l3[v-14][2] += 1
+        elif l3[v][0] == 0 and l3[v][2] >= 4:
+            l3[v][2] -= 3
+            l3[v-14][2] += 1
+            l3[v+14][2] += 1
+            l3[v+1][2] += 1
+        elif l3[v][0] == 14 and l3[v][2] >= 4:
+            l3[v][2] -= 3
+            l3[v-14][2] += 1
+            l3[v+14][2] += 1
+            l3[v-1][2] += 1
+        elif l3[v][1] == 0 and l3[v][2] >= 4:
+            l3[v][2] -= 3
+            l3[v+14][2] += 1
+            l3[v-1][2] += 1
+            l3[v+1][2] += 1
+        elif l3[v][1] == 14 and l3[v][2] >= 4:
+            l3[v][2] -= 3
+            l3[v-14][2] += 1
+            l3[v+1][2] += 1
+            l3[v-1][2] += 1
+        elif l3[v][2] >= 4:
+            l3[v][2] -= 4
+            l3[v+14][2] += 1
+            l3[v-14][2] += 1
+            l3[v+1][2] += 1
+            l3[v-1][2] += 1
+    for n in range(len(obj)):
+        canvas.delete(obj[n])##suppression des grains de sable de l'ancienne configuration
+    decal_x = [5,5,15,25,25]
+    decal_y = [5,25,15,25,5]
+    decal_a = [25,25,15,5,5]
+    decal_b = [25,5,15,5,25]
+    ##création des grains de sable avec la nouvelle configuration
+    for v in range(1,226):
+        for r in range(l3[v][2]):
+            obj.append(canvas.create_oval((l3[v][0]*40*p+decal_x[r]*p,0+40*l3[v][1]*p+decal_y[r]*p),(40*p+l3[v][0]*40*p-decal_a[r]*p,40*p+40*l3[v][1]*p-decal_b[r]*p), fill ="yellow"))
+    canvas.after(500, changement_config)
+##bouton executant la fonction changement_config
+bouton1 = tk.Button(racine, text="change config", command = changement_config)
+bouton1.grid(row=1, column= 0)
+
+racine.mainloop()
